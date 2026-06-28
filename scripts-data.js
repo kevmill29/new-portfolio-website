@@ -247,9 +247,82 @@ if __name__ == "__main__":
             { text: "    - system() PLT: 0x004010a0", type: "text" },
             { text: "[~] Dispatching payload to target daemon...", type: "system", delay: 400 },
             { text: "[+] Hijacked Instruction Pointer! Return redirected to system('/bin/sh')", type: "success", delay: 300 },
-            { text: "[!] Terminal session acquired. Upgrading to interactive bash shell.", type: "warning", delay: 400 },
             { text: "uid=0(root) gid=0(root) groups=0(root)", type: "success", delay: 200 },
             { text: "shell_access_granted@10.10.14.93:/root# _", type: "system", delay: 100 }
+        ]
+    },
+    
+    "ebpf-syscall-audit.py": {
+        name: "ebpf-syscall-audit.py",
+        lang: "python",
+        description: "eBPF-driven kernel system call monitor tracing real-time privilege elevations.",
+        tags: ["Kernel Auditing", "eBPF", "C/Python"],
+        version: "v0.8.0",
+        code: `#!/usr/bin/env python3
+# ebpf-syscall-audit.py - eBPF Execve Syscall Tracer
+from bcc import BPF
+import ctypes
+
+# eBPF Program (Compiles in kernel-space)
+ebpf_program = """
+#include <uapi/linux/ptrace.h>
+#include <linux/sched.h>
+
+struct event_data {
+    u32 pid;
+    u32 uid;
+    char comm[TASK_COMM_LEN];
+    char filepath[128];
+};
+
+BPF_PERF_OUTPUT(syscall_events);
+
+int kprobe__sys_execve(struct pt_regs *ctx, const char __user *filename) {
+    struct event_data event = {};
+    
+    // Extract PID and UID
+    event.pid = bpf_get_current_pid_tgid() >> 32;
+    event.uid = bpf_get_current_uid_gid();
+    
+    // Copy process comm and filepath from user memory
+    bpf_get_current_comm(&event.comm, sizeof(event.comm));
+    bpf_probe_read_user_str(&event.filepath, sizeof(event.filepath), filename);
+    
+    syscall_events.perf_submit(ctx, &event, sizeof(event));
+    return 0;
+}
+"""
+
+def print_event(cpu, data, size):
+    event = b["syscall_events"].event(data)
+    # Check if executed by root (UID 0) - potential privilege elevation
+    p_status = "ALERT: ROOT" if event.uid == 0 else "USER"
+    print(f"[{p_status}] PID: {event.pid} | UID: {event.uid} | Comm: {event.comm.decode()} | Executed: {event.filepath.decode()}")
+
+# Load kernel program
+b = BPF(text=ebpf_program)
+b["syscall_events"].open_perf_buffer(print_event)
+
+print("[*] eBPF System call auditing engine initialized.")
+print("[*] Hooked tracepoint: sys_execve. Monitoring kernel transitions...\\n")
+
+while True:
+    try:
+        b.perf_buffer_poll()
+    except KeyboardInterrupt:
+        exit(0)`,
+        simulation: [
+            { text: "[*] eBPF System call auditing engine initialized.", type: "info" },
+            { text: "[*] Hooked tracepoint: sys_execve. Monitoring kernel transitions...", type: "info" },
+            { text: "[~] Compiling eBPF program into kernel bytecode...", type: "system", delay: 500 },
+            { text: "[~] Loading BPF JIT compiler and inserting probe structures...", type: "system", delay: 300 },
+            { text: "[USER] PID: 18454 | UID: 1000 | Comm: bash | Executed: /usr/bin/ls", type: "text", delay: 400 },
+            { text: "[USER] PID: 18456 | UID: 1000 | Comm: git | Executed: /usr/bin/git status", type: "text", delay: 200 },
+            { text: "[ALERT: ROOT] PID: 18512 | UID: 0 | Comm: sudo | Executed: /usr/bin/sudo -i", type: "danger", delay: 600 },
+            { text: "[ALERT: ROOT] PID: 18515 | UID: 0 | Comm: bash | Executed: /usr/bin/apt update", type: "danger", delay: 300 },
+            { text: "[ALERT: ROOT] PID: 18590 | UID: 0 | Comm: kdevtmpfs | Executed: /tmp/pwn-canary", type: "danger", delay: 500 },
+            { text: "[!] CRITICAL WARNING: Non-standard daemon parent spawned root shell execution /tmp/pwn-canary", type: "danger", delay: 200 },
+            { text: "[USER] PID: 18602 | UID: 1000 | Comm: python3 | Executed: /usr/bin/python3 app.py", type: "text", delay: 400 }
         ]
     }
 };

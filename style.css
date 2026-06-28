@@ -1057,6 +1057,8 @@ header.top-status-bar {
         grid-template-columns: 1fr;
         height: auto;
         overflow-y: auto;
+        padding: 12px;
+        gap: 16px;
     }
     
     .sidebar-panel {
@@ -1071,8 +1073,9 @@ header.top-status-bar {
     
     .sandbox-grid {
         grid-template-columns: 1fr;
-        grid-template-rows: auto auto 300px;
+        grid-template-rows: auto;
         height: auto;
+        gap: 12px;
     }
     
     .sandbox-explorer {
@@ -1081,7 +1084,11 @@ header.top-status-bar {
     }
     
     .sandbox-editor {
-        height: 400px;
+        height: 350px;
+    }
+    
+    .sandbox-terminal {
+        height: 300px;
     }
     
     .writeups-container {
@@ -1090,6 +1097,45 @@ header.top-status-bar {
     }
     
     .writeup-viewer-panel {
-        height: 500px;
+        height: 450px;
+    }
+    
+    .workspace-tabs {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+    
+    .tab-btn {
+        padding: 8px 12px;
+        font-size: 12px;
+        flex: 1 1 auto;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 768px) {
+    header.top-status-bar {
+        flex-direction: column;
+        gap: 6px;
+        align-items: center;
+        padding: 10px;
+    }
+    
+    .status-left, .status-right {
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+    
+    .status-center {
+        margin: 4px 0;
+    }
+    
+    .profile-card {
+        padding: 16px;
+    }
+    
+    .credentials-grid {
+        grid-template-columns: 1fr;
     }
 }

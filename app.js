@@ -171,7 +171,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // 3. Signature Element: The Sandbox (Terminal & Inspector)
     // -------------------------------------------------------------
     
-    // Simple custom regex code highlighter
+    // Token-based robust code highlighter to prevent HTML tag collisions
     function highlightCode(code, lang) {
         // Escape HTML
         let escaped = code
@@ -179,26 +179,51 @@ document.addEventListener("DOMContentLoaded", () => {
             .replace(/</g, "&lt;")
             .replace(/>/g, "&gt;");
             
+        let regex;
         if (lang === "python") {
-            // Strings
-            escaped = escaped.replace(/(".*?"|'.*?')/g, '<span class="hljs-string">$1</span>');
-            // Keywords
-            escaped = escaped.replace(/\b(def|class|import|from|as|if|elif|else|for|while|try|except|return|async|await|with|None|True|False)\b/g, '<span class="hljs-keyword">$1</span>');
-            // Functions
-            escaped = escaped.replace(/\b(print|len|range|int|str|asyncio|run|gather)\b/g, '<span class="hljs-function">$1</span>');
-            // Comments
-            escaped = escaped.replace(/(#.*?)$/gm, '<span class="hljs-comment">$1</span>');
-        } else if (lang === "javascript") {
-            // Strings
-            escaped = escaped.replace(/(".*?"|'.*?'|`.*?`)/g, '<span class="hljs-string">$1</span>');
-            // Keywords
-            escaped = escaped.replace(/\b(const|let|var|function|return|if|else|for|while|try|catch|require|require|require|import|export|from|new|class|await|async)\b/g, '<span class="hljs-keyword">$1</span>');
-            // Functions & Loggers
-            escaped = escaped.replace(/(console\.log|console\.error|console\.warn)/g, '<span class="hljs-function">$1</span>');
-            // Comments
-            escaped = escaped.replace(/(\/\/.*?)$/gm, '<span class="hljs-comment">$1</span>');
+            regex = /("""[\s\S]*?"""|'''[\s\S]*?'''|"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|#.*)/g;
+        } else { // javascript
+            regex = /(\/\*[\s\S]*?\*\/|\/\/.*|"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|`(?:[^`\\]|\\.)*`)/g;
         }
-        return escaped;
+
+        let parts = [];
+        let lastIndex = 0;
+        let match;
+
+        regex.lastIndex = 0;
+
+        while ((match = regex.exec(escaped)) !== null) {
+            let before = escaped.substring(lastIndex, match.index);
+            parts.push(highlightKeywordsAndSymbols(before, lang));
+
+            let token = match[0];
+            if (token.startsWith("#") || token.startsWith("//") || token.startsWith("/*")) {
+                parts.push(`<span class="hljs-comment">${token}</span>`);
+            } else {
+                parts.push(`<span class="hljs-string">${token}</span>`);
+            }
+            lastIndex = regex.lastIndex;
+        }
+        
+        let remaining = escaped.substring(lastIndex);
+        parts.push(highlightKeywordsAndSymbols(remaining, lang));
+
+        return parts.join("");
+    }
+
+    function highlightKeywordsAndSymbols(text, lang) {
+        if (lang === "python") {
+            text = text
+                .replace(/\b(def|class|import|from|as|if|elif|else|for|while|try|except|return|async|await|with|None|True|False)\b/g, '<span class="hljs-keyword">$1</span>')
+                .replace(/\b(print|len|range|int|str|asyncio|run|gather|socket|argparse|sys)\b/g, '<span class="hljs-function">$1</span>')
+                .replace(/\b(\d+)\b/g, '<span class="hljs-number">$1</span>');
+        } else if (lang === "javascript") {
+            text = text
+                .replace(/\b(const|let|var|function|return|if|else|for|while|try|catch|require|import|export|from|new|class|await|async)\b/g, '<span class="hljs-keyword">$1</span>')
+                .replace(/\b(console\.log|console\.error|console\.warn|exec|parseLogLine|handleFailure|blockIp)\b/g, '<span class="hljs-function">$1</span>')
+                .replace(/\b(\d+)\b/g, '<span class="hljs-number">$1</span>');
+        }
+        return text;
     }
 
     function loadScript(scriptName) {
