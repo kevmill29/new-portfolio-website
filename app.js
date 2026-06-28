@@ -5,7 +5,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // 1. Core State & Data Initialization
     // -------------------------------------------------------------
     let currentTab = "sandbox";
-    let activeScript = "subnet-recon.py";
+    let activeScript = "keylogger_script.py";
     let activeWriteupId = null;
     let terminalBusy = false;
     let systemStatsInterval = null;
@@ -284,7 +284,12 @@ document.addEventListener("DOMContentLoaded", () => {
         runBtn.disabled = true;
         runBtn.textContent = "Executing...";
 
-        printTermLine(`user@sandbox:~$ python3 ${script.name} --target 192.168.8.1 --verbose`, "system");
+        // Choose correct command trigger visually depending on script type
+        let commandString = `python3 ${script.name}`;
+        if (script.name.endsWith(".ps1")) {
+            commandString = `powershell.exe -ExecutionPolicy Bypass -File .\\${script.name}`;
+        }
+        printTermLine(`user@sandbox:~$ ${commandString}`, "system");
         
         // Iterate through simulation steps
         for (let i = 0; i < script.simulation.length; i++) {

