@@ -488,6 +488,31 @@ conn.close()`,
 
 const WRITEUPS_DATA = [
     {
+        id: "writeup-etherhound",
+        title: "EtherHound: Silent 802.11 WiFi Probe Request Reconnaissance",
+        category: "Wireless Recon / Data Analysis",
+        date: "2026-06-25",
+        summary: "A detailed breakdown of building and testing a passive WiFi sniffer that hops across all 2.4GHz/5GHz channels to capture probe requests, identify MAC randomization patterns, and trace device signal presence.",
+        tags: ["WiFi", "Wireless", "Python", "Scapy", "Folium"],
+        content: `<h3>WHAT IT DOES</h3>
+<p>A passive WiFi reconnaissance tool that listens for 802.11 probe requests — the broadcast packets devices send out while searching for known networks, whether or not they ever connect to anything. By putting a wireless adapter into monitor mode and hopping across all 2.4GHz/5GHz channels, the tool detects nearby devices, resolves their hardware vendor, flags MAC randomization, and geotags each capture for visualization as a device-density heatmap — all without transmitting a single packet or touching the networks being probed for.</p>
+
+<h3>WHY I BUILT IT</h3>
+<p>I wanted to understand how much information our devices — phones, smartwatches, IoT and embedded devices, anything with WiFi — are giving away every single time they send out a probe request. These broadcasts happen constantly and silently, often before a device ever connects to anything, and I was curious exactly what could be reconstructed from that leakage alone: device presence, manufacturer, even rough movement patterns over time, all without the device's knowledge or consent to be observed. I built and tested this against my own phone, smartwatch, and IoT devices at home, on my own network.</p>
+
+<h3>HOW IT WORKS</h3>
+<p>The most interesting part of this script isn't the packet sniffing — it's a one-line trick for spotting MAC randomization. Per the IEEE 802 standard, the second-least-significant bit of a MAC's first octet is the "locally administered" bit; when it's set, the address isn't the device's real burned-in hardware address. Checking <code>first_octet &amp; 0x02</code> against that bit is enough to tell a randomized privacy MAC from a real one — a small detail, but it's the difference between a script that just prints MACs and one that actually understands the protocol it's reading.</p>
+<p>Around that core, the tool runs a background thread that cycles the radio through every available channel every 500ms (since you can only listen to one channel at a time, and devices probe across all of them), uses Scapy to filter specifically for probe-request frames, resolves vendor OUIs for non-randomized MACs, and logs everything to SQLite — timestamped, geotagged, and auto-archived between runs so old sessions never get overwritten.</p>
+
+<h3>WHAT I'D IMPROVE</h3>
+<p>This is still an active project, and I know exactly what's next:</p>
+<ul>
+  <li>Wire the live GPS relay (<code>get_gps_from_phone</code>) into the actual capture pipeline — right now it's implemented but not yet called, so location data falls back to a hardcoded coordinate</li>
+  <li>Move channel lookups out of the per-packet hot path — right-now-channel is re-queried via a subprocess call on every single capture, which won't scale once probe volume increases</li>
+  <li>Fix a couple of straggling typos from active development (an import name mismatch, a missing colon) that I caught on review</li>
+</ul>`
+    },
+    {
         id: "writeup-dhcp-rce",
         title: "Zero-Click Remote Code Execution (RCE) in Embedded Router Firmware",
         category: "Vulnerability Research",
