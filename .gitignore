@@ -1,0 +1,16 @@
+# Git ignore file for local files not to be pushed to remote
+
+# User Resume (Explicitly requested not to upload)
+Kevin_Emile_Resume_Google_DataCenterTech.docx
+
+# Local Databases & Script Outputs
+probe_log.db
+probe_log_archive_*.db
+probe_map.html
+log.txt
+*.log
+
+# Windows System Files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
