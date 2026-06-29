@@ -1,7 +1,7 @@
 # Git ignore file for local files not to be pushed to remote
 
-# User Resume (Explicitly requested not to upload)
-Kevin_Emile_Resume_Google_DataCenterTech.docx
+# User Documents & Resumes (Do not upload raw word documents)
+*.docx
 
 # Local Databases & Script Outputs
 probe_log.db

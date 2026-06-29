@@ -488,6 +488,62 @@ conn.close()`,
 
 const WRITEUPS_DATA = [
     {
+        id: "writeup-cisco-errors",
+        title: "Troubleshooting Network Interface Errors in Packet Tracer",
+        category: "Infrastructure / Networking",
+        date: "2026-06-20",
+        summary: "A walkthrough of diagnosing and resolving duplex mismatches, speed discrepancies, and administratively shut ports across multiple Cisco switches using native IOS telemetry.",
+        tags: ["Cisco IOS", "Packet Tracer", "Networking", "Troubleshooting"],
+        content: `<h3>Network Topology & Addressing</h3>
+<p>This diagnostic lab isolates and resolves interface errors inside a standard Cisco environment. The topology is simple: two PCs (192.168.0.1 and 192.168.0.2) connected through two Catalyst switches, with the trunk link on FastEthernet 0/1 being the source of operational discrepancies.</p>
+
+<table style="width:100%; border-collapse:collapse; margin: 16px 0; font-size:12px; font-family:var(--font-mono); text-align:left;">
+  <thead>
+    <tr style="border-bottom:1px solid var(--accent-cyan); color:#fff;">
+      <th style="padding:6px;">Device</th>
+      <th style="padding:6px;">IP Address</th>
+      <th style="padding:6px;">Subnet Mask</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr style="border-bottom:1px dashed rgba(255,255,255,0.05);">
+      <td style="padding:6px;">PC1</td>
+      <td style="padding:6px;">192.168.0.1</td>
+      <td style="padding:6px;">255.255.255.0</td>
+    </tr>
+    <tr style="border-bottom:1px dashed rgba(255,255,255,0.05);">
+      <td style="padding:6px;">PC2</td>
+      <td style="padding:6px;">192.168.0.2</td>
+      <td style="padding:6px;">255.255.255.0</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3>Diagnostic Command Arsenal</h3>
+<p>To identify and resolve layer 1/2 discrepancies on the Cisco IOS command line, the following operations are used:</p>
+<ul>
+  <li><code>show interfaces</code> — Detailed packet counts, error rates (CRC, runts, giants), and state.</li>
+  <li><code>show interfaces status</code> — Quick overview of speed, duplex, and administrative states.</li>
+  <li><code>duplex [half|full|auto]</code> — Forces interface duplex alignment.</li>
+  <li><code>speed [10|100|auto]</code> — Forces port speed allocation.</li>
+</ul>
+
+<h3>Task 1: The \"Why Can't I Ping?\" Problem (Port Shutdown)</h3>
+<p>Initial attempts to ping PC2 from PC1 failed with constant request timeouts. Running <code>show interfaces status</code> on Switch2 revealed the culprit: the FastEthernet 0/1 port status was flagged as <strong>\"disabled\"</strong> (meaning the interface was shut down manually). Consequently, Switch1's side of the same link showed <strong>\"down/down\"</strong>. Entering Switch2's interface configuration and issuing <code>no shutdown</code> successfully restored layer 1 connectivity, establishing successful ping traces.</p>
+<blockquote>
+  <strong>Diagnostic Rule:</strong> There is a critical difference between a link showing \"down/down\" (implying physical Layer 1 damage, bad cable, or dead port) and \"administratively down\" (implying manual command shutdown via configuration).
+</blockquote>
+
+<h3>Task 2: CDP Warnings (Duplex Mismatch)</h3>
+<p>Shortly after the link was restored, the Cisco Discovery Protocol (CDP) began logging console warnings every 60 seconds regarding a duplex mismatch: Switch1's Fa0/1 was configured for full duplex, while Switch2's Fa0/1 was locked in half duplex. Although the link remained technically up/up, a duplex mismatch on active links triggers collision loops and heavy packet loss under high volumes. Duplex was manually aligned on Switch2 using the command: <code>duplex full</code>. Console warnings subsided immediately.</p>
+
+<h3>Task 3: Speed Discrepancy (Flapping Links)</h3>
+<p>The final discrepancy identified was a speed mismatch: Switch1's Fa0/1 was locked at 10 Mbps, while Switch2 ran at 100 Mbps. Unlike duplex mismatches which cause collisions, speed mismatches prevent link negotiation entirely or cause random flapping. The interface speed on Switch1 was forced to 100 Mbps via the command: <code>speed 100</code>. This successfully resolved the final mismatch, establishing a clean Full-Duplex/100Mbps baseline.</p>
+
+<h3>The Bigger Picture</h3>
+<p>Getting comfortable parsing <code>show interfaces</code> and <code>show interfaces status</code> is crucial for diagnosing layer 1/2 anomalies in production enterprise environments. This lab develops the instincts required to quickly identify physical faults, speed mismatches, or administrative overrides on Catalyst platforms.</p>`
+    },
+    {
         id: "writeup-etherhound",
         title: "EtherHound: Silent 802.11 WiFi Probe Request Reconnaissance",
         category: "Wireless Recon / Data Analysis",
