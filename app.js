@@ -2,6 +2,33 @@
 
 document.addEventListener("DOMContentLoaded", () => {
     // -------------------------------------------------------------
+    // 0. Intro Screen Logic
+    // -------------------------------------------------------------
+    const introScreen = document.getElementById('intro-screen');
+    const btnEnter = document.getElementById('btn-enter');
+    
+    function startBootSequence() {
+        if (!introScreen || introScreen.classList.contains('hidden')) return;
+        
+        btnEnter.disabled = true;
+        btnEnter.textContent = "BOOTING...";
+        btnEnter.style.animation = "none";
+        
+        setTimeout(() => {
+            introScreen.classList.add('hidden');
+        }, 600);
+    }
+    
+    if (introScreen && btnEnter) {
+        btnEnter.addEventListener('click', startBootSequence);
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                startBootSequence();
+            }
+        });
+    }
+
+    // -------------------------------------------------------------
     // 1. Core State & Data Initialization
     // -------------------------------------------------------------
     let currentTab = "sandbox";
