@@ -496,6 +496,9 @@ const WRITEUPS_DATA = [
         tags: ["Cisco IOS", "Packet Tracer", "Networking", "Troubleshooting"],
         content: `<h3>Network Topology & Addressing</h3>
 <p>This diagnostic lab isolates and resolves interface errors inside a standard Cisco environment. The topology is simple: two PCs (192.168.0.1 and 192.168.0.2) connected through two Catalyst switches, with the trunk link on FastEthernet 0/1 being the source of operational discrepancies.</p>
+<div style="display:flex; justify-content:center; margin:16px 0;">
+  <img src="image1.png" alt="Cisco Packet Tracer Network Topology" style="max-width:100%; border:1px solid var(--border-glass); border-radius:8px; box-shadow:0 0 10px rgba(34,211,238,0.15);">
+</div>
 
 <table style="width:100%; border-collapse:collapse; margin: 16px 0; font-size:12px; font-family:var(--font-mono); text-align:left;">
   <thead>
@@ -541,7 +544,10 @@ const WRITEUPS_DATA = [
 <p>The final discrepancy identified was a speed mismatch: Switch1's Fa0/1 was locked at 10 Mbps, while Switch2 ran at 100 Mbps. Unlike duplex mismatches which cause collisions, speed mismatches prevent link negotiation entirely or cause random flapping. The interface speed on Switch1 was forced to 100 Mbps via the command: <code>speed 100</code>. This successfully resolved the final mismatch, establishing a clean Full-Duplex/100Mbps baseline.</p>
 
 <h3>The Bigger Picture</h3>
-<p>Getting comfortable parsing <code>show interfaces</code> and <code>show interfaces status</code> is crucial for diagnosing layer 1/2 anomalies in production enterprise environments. This lab develops the instincts required to quickly identify physical faults, speed mismatches, or administrative overrides on Catalyst platforms.</p>`
+<p>Getting comfortable parsing <code>show interfaces</code> and <code>show interfaces status</code> is crucial for diagnosing layer 1/2 anomalies in production enterprise environments. This lab develops the instincts required to quickly identify physical faults, speed mismatches, or administrative overrides on Catalyst platforms.</p>
+<div style="display:flex; justify-content:center; margin:16px 0;">
+  <img src="image2.png" alt="Switch Configuration Diagnostics" style="max-width:100%; border:1px solid var(--border-glass); border-radius:8px; box-shadow:0 0 10px rgba(139,92,246,0.15);">
+</div>`
     },
     {
         id: "writeup-etherhound",
