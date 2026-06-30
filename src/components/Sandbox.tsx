@@ -8,8 +8,29 @@ gsap.registerPlugin(ScrollTrigger);
 
 export default function Sandbox() {
   const [activeScript, setActiveScript] = useState('keylogger_script.py');
+  const [typedLines, setTypedLines] = useState<any[]>([]);
   const scripts = Object.values(SCRIPTS_DATA);
   
+  useEffect(() => {
+    const simulation = SCRIPTS_DATA[activeScript as keyof typeof SCRIPTS_DATA]?.simulation || [];
+    setTypedLines([]);
+    
+    let lineIndex = 0;
+    let timeout: ReturnType<typeof setTimeout>;
+
+    const printNextLine = () => {
+      if (lineIndex < simulation.length) {
+        setTypedLines(prev => [...prev, simulation[lineIndex]]);
+        lineIndex++;
+        timeout = setTimeout(printNextLine, Math.random() * 300 + 100);
+      }
+    };
+    
+    timeout = setTimeout(printNextLine, 500);
+
+    return () => clearTimeout(timeout);
+  }, [activeScript]);
+
   const sectionRef = useRef<HTMLElement>(null);
   const scrollWrapperRef = useRef<HTMLDivElement>(null);
 
@@ -87,9 +108,10 @@ export default function Sandbox() {
           <div className="terminal-output font-mono" style={{ color: 'var(--text-secondary)', fontSize: '14px', lineHeight: 1.6 }}>
             $ system@kevin-emile:~# ./run {activeScript} <br/>
             [~] Standby... executing simulation. <br/>
-            {SCRIPTS_DATA[activeScript as keyof typeof SCRIPTS_DATA]?.simulation.map((line: any, i: number) => (
+            {typedLines.map((line: any, i: number) => (
                <span key={i} style={{ color: line.type === 'success' ? '#00ff88' : line.type === 'warning' ? '#FFE600' : 'inherit' }}><br/>{line.text}</span>
             ))}
+            <span className="blinking-cursor" style={{ opacity: 1, animation: 'blink 1s step-end infinite', marginLeft: '4px' }}>_</span>
           </div>
         </div>
 

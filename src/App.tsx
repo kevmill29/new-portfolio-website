@@ -58,9 +58,9 @@ function App() {
       <main style={{ overflow: 'hidden' }}>
         <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
           <Hero />
-          <Sandbox />
           <Writeups />
           <Career />
+          <Sandbox />
         </div>
       </main>
       
