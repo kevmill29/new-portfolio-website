@@ -48,7 +48,7 @@ export default function Career() {
           <h3 className="text-accent font-mono" style={{ marginBottom: '2rem', fontSize: '14px', letterSpacing: '2px' }}>EDUCATION</h3>
           <div>
             <h4 style={{ fontSize: '1.5rem', marginBottom: '0.5rem', lineHeight: 1.3 }}>Western Governors University</h4>
-            <p className="text-secondary font-mono" style={{ fontSize: '14px', marginBottom: '0.2rem' }}>BS Cybersecurity and Information Assurance</p>
+            <p className="text-secondary font-mono" style={{ fontSize: '14px', marginBottom: '0.2rem' }}>BS Computer Science</p>
             <p className="text-secondary font-mono" style={{ fontSize: '14px' }}>2026 - 2028 (Expected)</p>
           </div>
         </div>
