@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import { useRef } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { Stars } from '@react-three/drei';
 import * as THREE from 'three';
@@ -6,7 +6,7 @@ import * as THREE from 'three';
 function Starfield() {
   const starsRef = useRef<THREE.Points>(null);
 
-  useFrame((state, delta) => {
+  useFrame((_, delta) => {
     if (starsRef.current) {
       starsRef.current.rotation.y -= delta * 0.05;
       starsRef.current.rotation.x -= delta * 0.02;
