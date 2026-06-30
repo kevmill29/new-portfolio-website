@@ -5,14 +5,22 @@ import MagneticButton from './MagneticButton';
 
 export default function Hero() {
   const [booted, setBooted] = useState(false);
+  const [progress, setProgress] = useState(0);
   const heroRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Enter') setBooted(true);
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    let currentProgress = 0;
+    const interval = setInterval(() => {
+      currentProgress += Math.random() * 5 + 2; 
+      if (currentProgress >= 100) {
+        currentProgress = 100;
+        clearInterval(interval);
+        setTimeout(() => setBooted(true), 200);
+      }
+      setProgress(currentProgress);
+    }, 150);
+
+    return () => clearInterval(interval);
   }, []);
 
   useGSAP(() => {
@@ -40,11 +48,14 @@ export default function Hero() {
       {!booted ? (
         <div className="boot-sequence" style={{ display: 'flex', flexDirection: 'column', gap: '2rem', alignItems: 'center' }}>
           <h1 className="boot-logo text-accent font-mono" style={{ fontSize: '3rem', letterSpacing: '4px', textShadow: '0 0 20px var(--accent-glow)' }}>
-            KEVIN_EMILE // SYSTEM
+            SYSTEM INITIATING
           </h1>
-          <MagneticButton onClick={() => setBooted(true)}>
-            PRESS ENTER TO INITIATE
-          </MagneticButton>
+          <div style={{ width: '300px', height: '2px', background: 'var(--surface-300)', position: 'relative', overflow: 'hidden' }}>
+            <div style={{ width: `${progress}%`, height: '100%', background: 'var(--accent-primary)', transition: 'width 0.2s linear', boxShadow: '0 0 10px var(--accent-glow)' }} />
+          </div>
+          <div className="font-mono text-secondary" style={{ fontSize: '14px', letterSpacing: '2px' }}>
+            {Math.floor(progress)}%
+          </div>
         </div>
       ) : (
         <div className="hero-content" style={{ opacity: 1 }}>
