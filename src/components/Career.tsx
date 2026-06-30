@@ -49,7 +49,7 @@ export default function Career() {
           <div>
             <h4 style={{ fontSize: '1.5rem', marginBottom: '0.5rem', lineHeight: 1.3 }}>Western Governors University</h4>
             <p className="text-secondary font-mono" style={{ fontSize: '14px', marginBottom: '0.2rem' }}>BS Cybersecurity and Information Assurance</p>
-            <p className="text-secondary font-mono" style={{ fontSize: '14px' }}>2022 - 2025</p>
+            <p className="text-secondary font-mono" style={{ fontSize: '14px' }}>2026 - 2028 (Expected)</p>
           </div>
         </div>
       </div>
