@@ -1,9 +1,32 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { CERTIFICATIONS } from '../data/portfolioData';
+import gsap from 'gsap';
+import { useGSAP } from '@gsap/react';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+gsap.registerPlugin(ScrollTrigger);
 
 export default function Career() {
+  const sectionRef = useRef<HTMLElement>(null);
+
+  useGSAP(() => {
+    gsap.fromTo('.bento-box', 
+      { y: 100, opacity: 0, scale: 0.95 },
+      { 
+        y: 0, opacity: 1, scale: 1, 
+        duration: 0.8, 
+        stagger: 0.15, 
+        ease: 'power3.out',
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start: 'top 70%',
+        }
+      }
+    );
+  }, { scope: sectionRef });
+
   return (
-    <section className="career-section" style={{ minHeight: '100vh', padding: '4rem 2rem' }}>
+    <section ref={sectionRef} className="career-section" style={{ minHeight: '100vh', padding: '8rem 2rem' }}>
       <h2 style={{ fontSize: '4rem', marginBottom: '3rem', letterSpacing: '-1px' }}>03 // CREDENTIALS</h2>
       
       <div className="bento-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '2rem' }}>

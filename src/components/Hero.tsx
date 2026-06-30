@@ -1,7 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import gsap from 'gsap';
+import { useGSAP } from '@gsap/react';
+import MagneticButton from './MagneticButton';
 
 export default function Hero() {
   const [booted, setBooted] = useState(false);
+  const heroRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -11,26 +15,46 @@ export default function Hero() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
+  useGSAP(() => {
+    if (booted) {
+      // Animate in the hero content
+      gsap.fromTo('.hero-text-reveal', 
+        { y: 50, opacity: 0 },
+        { y: 0, opacity: 1, duration: 1, stagger: 0.2, ease: 'power4.out', delay: 0.2 }
+      );
+    } else {
+      // Glitch animation on the boot sequence
+      gsap.to('.boot-logo', {
+        x: 'random(-3, 3)',
+        y: 'random(-3, 3)',
+        duration: 0.1,
+        repeat: -1,
+        repeatRefresh: true,
+        ease: 'none',
+      });
+    }
+  }, { scope: heroRef, dependencies: [booted] });
+
   return (
-    <section className="hero-section" style={{ height: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
+    <section ref={heroRef} className="hero-section" style={{ height: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
       {!booted ? (
         <div className="boot-sequence" style={{ display: 'flex', flexDirection: 'column', gap: '2rem', alignItems: 'center' }}>
-          <h1 className="text-accent font-mono" style={{ fontSize: '3rem', letterSpacing: '4px', textShadow: '0 0 20px var(--accent-glow)' }}>
+          <h1 className="boot-logo text-accent font-mono" style={{ fontSize: '3rem', letterSpacing: '4px', textShadow: '0 0 20px var(--accent-glow)' }}>
             SEC_OPS // TERMINAL
           </h1>
-          <button className="magnetic-btn" onClick={() => setBooted(true)}>
+          <MagneticButton onClick={() => setBooted(true)}>
             PRESS ENTER TO INITIATE
-          </button>
+          </MagneticButton>
         </div>
       ) : (
-        <div className="hero-content" style={{ opacity: 1, transition: 'opacity 1s var(--ease-out-expo)' }}>
-          <h1 style={{ fontSize: '8vw', lineHeight: 1, marginBottom: '1rem', textTransform: 'uppercase', letterSpacing: '-0.02em' }}>
+        <div className="hero-content" style={{ opacity: 1 }}>
+          <h1 className="hero-text-reveal" style={{ fontSize: '8vw', lineHeight: 1, marginBottom: '1rem', textTransform: 'uppercase', letterSpacing: '-0.02em' }}>
             KEVIN EMILE
           </h1>
-          <h2 className="text-accent" style={{ fontSize: '1.5rem', fontFamily: 'var(--font-mono)', letterSpacing: '2px' }}>
+          <h2 className="hero-text-reveal text-accent" style={{ fontSize: '1.5rem', fontFamily: 'var(--font-mono)', letterSpacing: '2px' }}>
             // CYBERSECURITY_ENGINEER
           </h2>
-          <p style={{ marginTop: '2rem', maxWidth: '600px', color: 'var(--text-secondary)', fontSize: '1.2rem' }}>
+          <p className="hero-text-reveal" style={{ marginTop: '2rem', maxWidth: '600px', color: 'var(--text-secondary)', fontSize: '1.2rem' }}>
             Forward-thinking security analyst specializing in threat reconnaissance, automated remediation, and zero-trust architectures.
           </p>
         </div>
