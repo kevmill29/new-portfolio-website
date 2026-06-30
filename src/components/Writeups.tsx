@@ -21,7 +21,7 @@ export default function Writeups() {
         end: 'bottom 80%',
         pin: true,
         pinSpacing: false,
-        id: \`card-\${i}\`,
+        id: `card-${i}`,
         invalidateOnRefresh: true,
       });
 

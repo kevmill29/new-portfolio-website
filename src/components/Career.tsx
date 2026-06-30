@@ -1,5 +1,4 @@
 import React, { useRef } from 'react';
-import { CERTIFICATIONS } from '../data/portfolioData';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -36,7 +35,7 @@ export default function Career() {
           <h3 className="text-accent font-mono" style={{ marginBottom: '2rem', fontSize: '14px', letterSpacing: '2px' }}>EXPERIENCE</h3>
           <div style={{ marginBottom: '2rem' }}>
             <h4 style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>Cencora</h4>
-            <p className="text-secondary font-mono" style={{ fontSize: '14px' }}>Cybersecurity Analyst | 2023 - Present</p>
+            <p className="text-secondary font-mono" style={{ fontSize: '14px' }}>Computer Operator | 2023 - Present</p>
           </div>
           <div>
             <h4 style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>Allied Universal</h4>
@@ -54,17 +53,6 @@ export default function Career() {
           </div>
         </div>
 
-        {/* Certs Box */}
-        <div className="glass-panel bento-box" style={{ padding: '3rem' }}>
-          <h3 className="text-accent font-mono" style={{ marginBottom: '2rem', fontSize: '14px', letterSpacing: '2px' }}>CERTIFICATIONS</h3>
-          <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-            {CERTIFICATIONS.map((cert: any) => (
-              <li key={cert.name}>
-                <h4 style={{ fontSize: '1.2rem', marginBottom: '0.5rem' }}>{cert.name}</h4>
-                <p className="text-secondary font-mono" style={{ fontSize: '14px' }}>{cert.provider} | {cert.status}</p>
-              </li>
-            ))}
-          </ul>
         </div>
         
       </div>

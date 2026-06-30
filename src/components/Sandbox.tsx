@@ -24,7 +24,7 @@ export default function Sandbox() {
       scrollTrigger: {
         trigger: sectionRef.current,
         start: 'top top',
-        end: \`+=\${scrollWidth}\`,
+        end: `+=${scrollWidth}`,
         pin: true,
         scrub: 1,
         invalidateOnRefresh: true,
