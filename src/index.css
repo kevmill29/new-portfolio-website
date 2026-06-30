@@ -79,3 +79,10 @@ html, body {
 .magnetic-btn:hover {
   box-shadow: 0 0 20px var(--accent-glow);
 }
+
+.writeup-html-content h3 { color: var(--accent-primary); margin-top: 2rem; margin-bottom: 1rem; }
+.writeup-html-content p { margin-bottom: 1.5rem; }
+.writeup-html-content ul { padding-left: 1.5rem; margin-bottom: 1.5rem; list-style-type: disc; color: var(--text-secondary); }
+.writeup-html-content li { margin-bottom: 0.5rem; }
+.writeup-html-content blockquote { border-left: 4px solid var(--accent-primary); padding-left: 1rem; color: var(--text-secondary); font-style: italic; background: var(--surface-200); padding: 1rem; margin-bottom: 1.5rem; }
+.writeup-html-content code { font-family: var(--font-mono); background: var(--surface-300); padding: 2px 6px; border-radius: 4px; font-size: 0.9em; }
