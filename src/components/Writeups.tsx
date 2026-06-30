@@ -105,13 +105,17 @@ export default function Writeups() {
 
       {/* Fullscreen Modal */}
       {activeWriteup && (
-        <div style={{ 
+        <div 
+          onClick={() => setActiveWriteup(null)}
+          style={{ 
           position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', 
           background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(10px)', 
           zIndex: 9999, display: 'flex', justifyContent: 'center', alignItems: 'center',
           padding: '2rem'
         }}>
-          <div className="glass-panel" style={{ 
+          <div 
+            onClick={(e) => e.stopPropagation()}
+            className="glass-panel" style={{ 
             background: '#050505', width: '100%', maxWidth: '900px', maxHeight: '90vh', 
             overflowY: 'auto', padding: '3rem', position: 'relative', border: '1px solid var(--surface-300)'
           }}>

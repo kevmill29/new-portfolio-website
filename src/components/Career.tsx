@@ -52,9 +52,6 @@ export default function Career() {
             <p className="text-secondary font-mono" style={{ fontSize: '14px' }}>2022 - 2025</p>
           </div>
         </div>
-
-        </div>
-        
       </div>
     </section>
   );
