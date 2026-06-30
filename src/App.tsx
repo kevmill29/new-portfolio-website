@@ -63,7 +63,7 @@ function App() {
       </main>
       
       <footer style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-disabled)', fontFamily: 'var(--font-mono)' }}>
-        <p>SEC-OPS // Portfolio & Security Sandbox. © 2026 Kevin Emile.</p>
+        <p>Kevin Emile // Infrastructure & Security Portfolio. © 2026.</p>
       </footer>
     </div>
   );

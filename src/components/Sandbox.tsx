@@ -77,7 +77,7 @@ export default function Sandbox() {
         <div className="glass-panel" style={{ padding: '2rem', background: '#030303', border: '1px solid var(--surface-300)', width: '600px', flexShrink: 0, height: '100%' }}>
           <h3 className="text-accent" style={{ marginBottom: '1.5rem', fontFamily: 'var(--font-mono)', fontSize: '12px', letterSpacing: '1px' }}>TERMINAL</h3>
           <div className="terminal-output font-mono" style={{ color: 'var(--text-secondary)', fontSize: '14px', lineHeight: 1.6 }}>
-            $ root@sec-ops:~# ./run {activeScript} <br/>
+            $ system@kevin-emile:~# ./run {activeScript} <br/>
             [~] Standby... executing simulation. <br/>
             {SCRIPTS_DATA[activeScript as keyof typeof SCRIPTS_DATA]?.simulation.map((line: any, i: number) => (
                <span key={i} style={{ color: line.type === 'success' ? '#00ff88' : line.type === 'warning' ? '#FFE600' : 'inherit' }}><br/>{line.text}</span>

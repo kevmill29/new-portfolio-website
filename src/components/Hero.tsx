@@ -40,7 +40,7 @@ export default function Hero() {
       {!booted ? (
         <div className="boot-sequence" style={{ display: 'flex', flexDirection: 'column', gap: '2rem', alignItems: 'center' }}>
           <h1 className="boot-logo text-accent font-mono" style={{ fontSize: '3rem', letterSpacing: '4px', textShadow: '0 0 20px var(--accent-glow)' }}>
-            SEC_OPS // TERMINAL
+            KEVIN_EMILE // SYSTEM
           </h1>
           <MagneticButton onClick={() => setBooted(true)}>
             PRESS ENTER TO INITIATE
@@ -54,8 +54,8 @@ export default function Hero() {
           <h2 className="hero-text-reveal text-accent" style={{ fontSize: '1.5rem', fontFamily: 'var(--font-mono)', letterSpacing: '2px' }}>
             // CYBERSECURITY_ENGINEER
           </h2>
-          <p className="hero-text-reveal" style={{ marginTop: '2rem', maxWidth: '600px', color: 'var(--text-secondary)', fontSize: '1.2rem' }}>
-            Forward-thinking security analyst specializing in threat reconnaissance, automated remediation, and zero-trust architectures.
+          <p className="hero-text-reveal" style={{ marginTop: '2rem', maxWidth: '800px', color: 'var(--text-secondary)', fontSize: '1.2rem', lineHeight: 1.6 }}>
+            Uptime isn't a goal, it's the baseline. Security isn't a feature, it's the foundation. I engineer the infrastructure people only notice when it isn't there — and make sure they never have to.
           </p>
         </div>
       )}
