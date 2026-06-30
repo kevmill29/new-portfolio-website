@@ -7,6 +7,7 @@ import Hero from './components/Hero';
 import Sandbox from './components/Sandbox';
 import Writeups from './components/Writeups';
 import Career from './components/Career';
+import StarsBackground from './components/StarsBackground';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -46,7 +47,8 @@ function App() {
 
   return (
     <div ref={containerRef} className="app-container" style={{ position: 'relative' }}>
-      {/* Background Grid */}
+      <StarsBackground />
+      {/* Background Grid Overlay */}
       <div style={{ 
         position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', 
         backgroundImage: 'linear-gradient(rgba(28, 28, 28, 0.4) 1px, transparent 1px), linear-gradient(90deg, rgba(28, 28, 28, 0.4) 1px, transparent 1px)', 
