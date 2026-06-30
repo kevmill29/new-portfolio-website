@@ -1,0 +1,81 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+
+:root {
+  /* Color Palette */
+  --bg-black: #000000;
+  --surface-100: #0A0A0A;
+  --surface-200: #111111;
+  --surface-300: #1C1C1C;
+  
+  --accent-primary: #FFE600;
+  --accent-glow: rgba(255, 230, 0, 0.4);
+
+  --text-primary: #FFFFFF;
+  --text-secondary: #A1A1A1;
+  --text-disabled: #5A5A5A;
+  --text-inverse: #000000;
+
+  /* Typography */
+  --font-display: 'Space Grotesk', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  /* Motion & Easing */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --duration-fast: 0.4s;
+  --duration-normal: 0.8s;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  background-color: var(--bg-black);
+  color: var(--text-primary);
+  font-family: var(--font-display);
+  line-height: 1.5;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Reduced Motion Guard */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Utilities */
+.text-accent { color: var(--accent-primary); }
+.text-secondary { color: var(--text-secondary); }
+.font-mono { font-family: var(--font-mono); }
+
+.glass-panel {
+  background: var(--surface-100);
+  border: 1px solid var(--surface-300);
+  position: relative;
+  overflow: hidden;
+}
+
+.magnetic-btn {
+  background: var(--accent-primary);
+  color: var(--text-inverse);
+  border: none;
+  padding: 12px 24px;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: transform 0.2s var(--ease-out-expo);
+}
+.magnetic-btn:hover {
+  box-shadow: 0 0 20px var(--accent-glow);
+}
