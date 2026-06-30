@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
-import MagneticButton from './MagneticButton';
+
 
 export default function Hero() {
   const [booted, setBooted] = useState(false);
