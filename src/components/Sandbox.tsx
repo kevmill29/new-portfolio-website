@@ -143,7 +143,7 @@ export default function Sandbox() {
 
   return (
     <section ref={sectionRef} className="sandbox-section" style={{ minHeight: '100vh', overflow: 'hidden', padding: '4rem 0', background: 'var(--bg-black)' }}>
-      <h2 style={{ fontSize: '4rem', marginBottom: '3rem', letterSpacing: '-1px', paddingLeft: '2rem' }}>01 // THE SANDBOX</h2>
+      <h2 style={{ fontSize: '4rem', marginBottom: '3rem', letterSpacing: '-1px', paddingLeft: '2rem' }}>04 // THE SANDBOX</h2>
       
       <div 
         ref={scrollWrapperRef}

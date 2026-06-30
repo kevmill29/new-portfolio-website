@@ -62,8 +62,8 @@ export default function Hero() {
           <h1 className="hero-text-reveal" style={{ fontSize: '8vw', lineHeight: 1, marginBottom: '1rem', textTransform: 'uppercase', letterSpacing: '-0.02em' }}>
             KEVIN EMILE
           </h1>
-          <h2 className="hero-text-reveal text-accent" style={{ fontSize: '1.5rem', fontFamily: 'var(--font-mono)', letterSpacing: '2px' }}>
-            // CYBERSECURITY_ENGINEER
+          <h2 className="hero-text-reveal text-accent" style={{ fontSize: '1.2rem', fontFamily: 'var(--font-mono)', letterSpacing: '1px', lineHeight: 1.5 }}>
+            // Aspiring Network & Security Engineer — targeting SOC Analyst, Network Security, and cleared cybersecurity roles
           </h2>
           <p className="hero-text-reveal" style={{ marginTop: '2rem', maxWidth: '800px', color: 'var(--text-secondary)', fontSize: '1.2rem', lineHeight: 1.6 }}>
             Uptime isn't a goal, it's the baseline. Security isn't a feature, it's the foundation. I engineer the infrastructure people only notice when it isn't there — and make sure they never have to.

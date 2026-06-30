@@ -4,6 +4,7 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 import Hero from './components/Hero';
+import About from './components/About';
 import Sandbox from './components/Sandbox';
 import Writeups from './components/Writeups';
 import Career from './components/Career';
@@ -58,6 +59,7 @@ function App() {
       <main style={{ overflow: 'hidden' }}>
         <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
           <Hero />
+          <About />
           <Writeups />
           <Career />
           <Sandbox />
